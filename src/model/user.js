@@ -4,7 +4,7 @@ const validator=require('validator')
 const jwt=require('jsonwebtoken')
 const Task = require('../model/task')
 
-const userSchema= mongoose.Schema({
+const userSchema= new mongoose.Schema({
     name:{
         type:String,
         required:true
@@ -46,6 +46,8 @@ const userSchema= mongoose.Schema({
             require:true
         }
     }]
+},{
+    timestamps:true
 })
 
 userSchema.virtual('tasks',{

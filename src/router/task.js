@@ -19,14 +19,18 @@ router.post('/tasks', auth ,async (req,res)=>{
     }
 })
 
-
+// GET -->  /tasks?completed=true
 router.get('/tasks', auth ,async (req,res) =>{
-
+    const match={}
+    if(req.query.completed){
+        match.completed = req.query.completed === 'true' //becaz in url thst is string
+    }
     try{
-        // await req.user.populate('tasks').execPopulate()
-        // res.send(req.user.tasks)
-        const tasks= await Task.find({ owner:req.user._id })
-        res.status(200).send(tasks)
+
+        // const tasks= await Task.find({ owner:req.user._id })
+        // res.status(200).send(tasks)
+        await req.user.populate({path:'tasks',match }).execPopulate()
+        res.send(req.user.tasks)
     }catch(e){
         res.status(500).send()
     }
