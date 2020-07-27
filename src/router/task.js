@@ -3,7 +3,7 @@ const Task=require('../model/task')
 const auth=require('../middleware/auth')
 const router=express.Router()
 
-// why we use async-await bcaz async function default return a promise...so dont need to write again agai then() and catch()
+// why we use async-await bcaz async function default return a promise...so dont need to write again again then() and catch()
 
 router.post('/tasks', auth ,async (req,res)=>{
     //const task=new Task(req.body)
@@ -20,10 +20,17 @@ router.post('/tasks', auth ,async (req,res)=>{
 })
 
 // GET -->  /tasks?completed=true
+// GET -->  /tasks?limit=2&skip=0
+// GET --> /tasks?sortBy=createdAt:desc
 router.get('/tasks', auth ,async (req,res) =>{
     const match={}
+    const sort={}
     if(req.query.completed){
-        match.completed = req.query.completed === 'true' //becaz in url thst is string
+        match.completed = req.query.completed === 'true' //becaz in url that is string
+    }
+    if(req.query.sortBy){
+        const parts= req.query.sortBy.split(':')
+        sort[parts[0]] = parts[1] === 'desc' ? -1 : 1
     }
     try{
 
@@ -31,10 +38,11 @@ router.get('/tasks', auth ,async (req,res) =>{
         // res.status(200).send(tasks)
         await req.user.populate({
             path:'tasks',
-            match,
+            match,                  //match:match -------> sort hand property name 
             options:{
                 limit:parseInt(req.query.limit),
-                skip:parseInt(req.query.skip)
+                skip:parseInt(req.query.skip),
+                sort                //sort:sort
             } }).execPopulate()
         res.send(req.user.tasks)
     }catch(e){
